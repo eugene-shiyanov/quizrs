@@ -1,0 +1,9 @@
+[package]
+name = "quizrs"
+version = "0.1.0"
+authors = ["eugene"]
+edition = "2018"
+
+[dependencies]
+gtk = "0.6.0"
+gio = "0.6.0"
