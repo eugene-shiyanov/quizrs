@@ -32,7 +32,11 @@ fn main() {
 
         clear_question(&vbox);
         let questions = get_questions();
-        render_question(&questions[0], &vbox);
+        let radio_buttons = render_question(&questions[0], &vbox);
+
+        button.connect_clicked(move |_| {
+            verify_answer(&radio_buttons, questions[0].get_correct_answer_index());
+        });
 
         win.show_all();
     });
@@ -61,9 +65,10 @@ fn clear_question(vbox: &gtk::Box) {
     }
 }
 
-fn render_question(question: &Question, vbox: &gtk::Box) {
+fn render_question(question: &Question, vbox: &gtk::Box) -> Vec<gtk::RadioButton> {
     let label = gtk::Label::new(question.get_text().as_str());
     vbox.pack_start(&label, true, true, 5);
+    let mut radio_buttons = Vec::new();
     let mut radio_button = Option::None;
 
     for (index, answer) in question.get_answers().iter().enumerate() {
@@ -77,8 +82,22 @@ fn render_question(question: &Question, vbox: &gtk::Box) {
         }
 
         match radio_button {
-            Some(ref rb) => vbox.pack_start(rb, true, true, 5),
+            Some(ref rb) => {
+                vbox.pack_start(rb, true, true, 5);
+                radio_buttons.push(rb.clone());
+            },
             None => {},
         }
     }
+
+    radio_buttons
 }
+
+fn verify_answer(answers: &[gtk::RadioButton], correct_answer_index: usize) {
+    if answers[correct_answer_index].get_active() {
+        println!("Win!");
+    } else {
+        println!("Fail");
+    }
+}
+

@@ -1,7 +1,7 @@
 pub struct Question {
     text: String,
     answers: Vec<String>,
-    correct_answer_index: i32
+    correct_answer_index: usize
 }
 
 impl Question {
@@ -17,7 +17,7 @@ impl Question {
         self.answers.push(String::from(text));
     }
 
-    pub fn set_correct_answer_index(&mut self, i: i32) {
+    pub fn set_correct_answer_index(&mut self, i: usize) {
         self.correct_answer_index = i;
     }
 
@@ -27,5 +27,9 @@ impl Question {
 
     pub fn get_answers(&self) -> &[String] {
         &self.answers
+    }
+
+    pub fn get_correct_answer_index(&self) -> usize {
+        self.correct_answer_index
     }
 }
