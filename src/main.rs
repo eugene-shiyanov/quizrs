@@ -64,15 +64,21 @@ fn clear_question(vbox: &gtk::Box) {
 fn render_question(question: &Question, vbox: &gtk::Box) {
     let label = gtk::Label::new(question.get_text().as_str());
     vbox.pack_start(&label, true, true, 5);
-    let mut radio_button;
+    let mut radio_button = Option::None;
 
     for (index, answer) in question.get_answers().iter().enumerate() {
         if index == 0 {
-            radio_button = gtk::RadioButton::new_with_label(answer);
+            radio_button = Option::Some(gtk::RadioButton::new_with_label(answer));
         } else {
-            radio_button = gtk::RadioButton::new_with_label_from_widget(&radio_button, answer);
+            match radio_button {
+                Some(rb) => radio_button = Some(gtk::RadioButton::new_with_label_from_widget(&rb, answer)),
+                None => {},
+            }
         }
 
-        vbox.pack_start(&radio_button, true, true, 5);
+        match radio_button {
+            Some(ref rb) => vbox.pack_start(rb, true, true, 5),
+            None => {},
+        }
     }
 }
