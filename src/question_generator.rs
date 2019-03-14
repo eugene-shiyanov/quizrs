@@ -45,6 +45,7 @@ fn create_questions() -> Vec<Question> {
     question.add_answer("Cheetah");
     question.add_answer("Hare");
     question.set_correct_answer_index(3);
+    questions.push(question);
 
     questions
 }
