@@ -1,3 +1,4 @@
+#[derive(Clone)]
 pub struct Question {
     text: String,
     answers: Vec<String>,

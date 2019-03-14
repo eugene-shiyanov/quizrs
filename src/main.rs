@@ -6,6 +6,7 @@ use std::env;
 
 mod question;
 mod ui;
+mod question_generator;
 
 use question::Question;
 

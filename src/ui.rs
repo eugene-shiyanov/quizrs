@@ -12,30 +12,24 @@ pub fn setup_ui(app: &gtk::Application, question: Question) {
         let button_box = gtk::ButtonBox::new(gtk::Orientation::Horizontal);
         vbox.pack_end(&button_box, true, true, 5);
 
-        let button = gtk::Button::new_with_label("Verify!");
+        let button = gtk::Button::new_with_label("Start");
         button_box.add(&button);
 
-        clear_question(&vbox);
-        let radio_buttons = render_question(&question, &vbox);
-
         button.connect_clicked(move |_| {
-            verify_answer(&radio_buttons, question.get_correct_answer_index());
+            clear_form(&vbox);
+            render_question(question.clone(), &vbox);
         });
 
         win.show_all();
 }
 
-fn clear_question(vbox: &gtk::Box) {
-    let widgets = vbox.get_children();
-
-    for widget in widgets {
-        if widget.is::<gtk::Label>() || widget.is::<gtk::RadioButton>() {
-            vbox.remove(&widget);
-        }
+fn clear_form(vbox: &gtk::Box) {
+    for widget in vbox.get_children() {
+        vbox.remove(&widget);
     }
 }
 
-fn render_question(question: &Question, vbox: &gtk::Box) -> Vec<gtk::RadioButton> {
+fn render_question(question: Question, vbox: &gtk::Box) {
     let label = gtk::Label::new(question.get_text().as_str());
     vbox.pack_start(&label, true, true, 5);
     let mut radio_buttons = Vec::new();
@@ -60,13 +54,35 @@ fn render_question(question: &Question, vbox: &gtk::Box) -> Vec<gtk::RadioButton
         }
     }
 
-    radio_buttons
+    let button_box = gtk::ButtonBox::new(gtk::Orientation::Horizontal);
+    vbox.pack_end(&button_box, true, true, 5);
+
+    let button = gtk::Button::new_with_label("Verify");
+    let vbox_clone = vbox.clone();
+    button.connect_clicked(move |_| {
+        clear_form(&vbox_clone);
+        render_result(&vbox_clone, verify_answer(&radio_buttons, question.get_correct_answer_index()));
+    });
+    button_box.add(&button);
+    vbox.show_all();
 }
 
-fn verify_answer(answers: &[gtk::RadioButton], correct_answer_index: usize) {
-    if answers[correct_answer_index].get_active() {
-        println!("Win!");
+fn render_result(vbox: &gtk::Box, success: bool) {
+    let text = if success {
+        "Win!"
     } else {
-        println!("Fail");
-    }
+        "Fail"
+    };
+
+    let label = gtk::Label::new(text);
+    vbox.pack_start(&label, true, true, 5);
+    let button_box = gtk::ButtonBox::new(gtk::Orientation::Horizontal);
+    vbox.pack_start(&button_box, true, true, 5);
+    let button = gtk::Button::new_with_label("Start");
+    button_box.add(&button);
+    vbox.show_all();
+}
+
+fn verify_answer(answers: &[gtk::RadioButton], correct_answer_index: usize) -> bool {
+    answers[correct_answer_index].get_active()
 }
