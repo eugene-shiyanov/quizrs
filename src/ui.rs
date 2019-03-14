@@ -1,7 +1,9 @@
 use gtk::prelude::*;
-use crate::question::Question;
+use crate::question_generator::QuestionGenerator;
 
-pub fn setup_ui(app: &gtk::Application, question: Question) {
+
+
+pub fn setup_ui(app: &gtk::Application) {
     let win = gtk::ApplicationWindow::new(app);
         win.set_default_size(320, 200);
         win.set_title("Quiz");
@@ -17,7 +19,7 @@ pub fn setup_ui(app: &gtk::Application, question: Question) {
 
         button.connect_clicked(move |_| {
             clear_form(&vbox);
-            render_question(question.clone(), &vbox);
+            render_question(QuestionGenerator::new(), &vbox);
         });
 
         win.show_all();
@@ -29,7 +31,9 @@ fn clear_form(vbox: &gtk::Box) {
     }
 }
 
-fn render_question(question: Question, vbox: &gtk::Box) {
+fn render_question(question_generator: QuestionGenerator, vbox: &gtk::Box) {
+    let mut question_generator = question_generator;
+    let question = question_generator.next();
     let label = gtk::Label::new(question.get_text().as_str());
     vbox.pack_start(&label, true, true, 5);
     let mut radio_buttons = Vec::new();
@@ -61,13 +65,14 @@ fn render_question(question: Question, vbox: &gtk::Box) {
     let vbox_clone = vbox.clone();
     button.connect_clicked(move |_| {
         clear_form(&vbox_clone);
-        render_result(&vbox_clone, verify_answer(&radio_buttons, question.get_correct_answer_index()));
+        let success = verify_answer(&radio_buttons, question.get_correct_answer_index());
+        render_result(&vbox_clone, success, question_generator.clone());
     });
     button_box.add(&button);
     vbox.show_all();
 }
 
-fn render_result(vbox: &gtk::Box, success: bool) {
+fn render_result(vbox: &gtk::Box, success: bool, question_generator: QuestionGenerator) {
     let text = if success {
         "Win!"
     } else {
@@ -79,6 +84,11 @@ fn render_result(vbox: &gtk::Box, success: bool) {
     let button_box = gtk::ButtonBox::new(gtk::Orientation::Horizontal);
     vbox.pack_start(&button_box, true, true, 5);
     let button = gtk::Button::new_with_label("Start");
+    let vbox_clone = vbox.clone();
+    button.connect_clicked(move |_| {
+        clear_form(&vbox_clone);
+        render_question(question_generator.clone(), &vbox_clone);
+    });
     button_box.add(&button);
     vbox.show_all();
 }

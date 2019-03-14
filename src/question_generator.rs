@@ -1,5 +1,6 @@
 use crate::question::Question;
 
+#[derive(Clone)]
 pub struct QuestionGenerator {
     questions: Vec<Question>,
     next_question: usize,
@@ -19,7 +20,7 @@ impl QuestionGenerator {
         if self.next_question == self.questions.len() - 1 {
             self.next_question = 0;
         } else {
-            self.next_question += self.next_question;
+            self.next_question += 1;
         }
 
         question
